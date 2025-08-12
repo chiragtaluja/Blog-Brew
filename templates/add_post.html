@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Blog Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Add a New Blog Post</h1>
+    <form method="POST" action="/add">
+        <label>Title:</label><br>
+        <input type="text" name="title" required><br><br>
+
+        <label>Content:</label><br>
+        <textarea name="content" required></textarea><br><br>
+
+        <label>Author:</label><br>
+        <input type="text" name="author" required><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

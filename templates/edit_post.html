@@ -1,0 +1,24 @@
+<!-- templates/edit_post.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Blog Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Edit Blog Post</h1>
+    <form method="POST">
+        <label>Title:</label><br>
+        <input type="text" name="title" value="{{ post.title }}" required><br><br>
+
+        <label>Content:</label><br>
+        <textarea name="content" required>{{ post.content }}</textarea><br><br>
+
+        <label>Author:</label><br>
+        <input type="text" name="author" value="{{ post.author }}" required><br><br>
+
+        <input type="submit" value="Update Post">
+    </form>
+</body>
+</html>
+    <a href="/">🏠 Back to All Posts</a>

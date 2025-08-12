@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogHub - Modern Blog Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <div class="auth-links">
+                    {% if session.get('user_id') %}
+                        <span class="welcome-msg"><i class="fas fa-user-circle"></i> Welcome, {{ session['username'] }}</span>
+                        <a href="/logout" class="auth-btn">Log Out</a>
+                    {% else %}
+                        <a href="/login" class="auth-btn">Sign In</a>
+                        <a href="/register" class="auth-btn">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="/">Blog<span>Hub</span></a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="/" class="active">Home</a></li>
+                        <li><a href="#">Categories</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="/add" class="new-post-btn">New Post</a></li>
+                    </ul>
+                </nav>
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Share Your Thoughts With The World</h1>
+                <p>A platform for writers and thinkers to express themselves freely</p>
+                <a href="/add" class="hero-btn">Start Writing</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Posts -->
+    <section class="featured-posts">
+        <div class="container">
+            <h2 class="section-title">Featured Posts</h2>
+            <div class="featured-grid">
+                {% for post in posts[:3] %}
+                <div class="featured-card">
+                    <div class="featured-image">
+                        <img src="https://source.unsplash.com/random/600x400/?blog,writing,{{ loop.index }}" alt="Featured Post">
+                    </div>
+                    <div class="featured-content">
+                        <div class="post-meta">
+                            <span class="category">Technology</span>
+                            <span class="date">{{ post.created_at.strftime('%b %d, %Y') if post.created_at else '' }}</span>
+                        </div>
+                        <h3><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
+                        <p>{{ post.content|truncate(120) }}</p>
+                        <div class="author-info">
+                            <div class="author-avatar">
+                                <img src="https://i.pravatar.cc/40?img={{ loop.index }}" alt="Author">
+                            </div>
+                            <span class="author-name">{{ post.author }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="content-wrapper">
+                <!-- Posts Section -->
+                <section class="posts-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Latest Posts</h2>
+                        <div class="view-options">
+                            <button class="view-option active"><i class="fas fa-th-large"></i></button>
+                            <button class="view-option"><i class="fas fa-list"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="posts-grid">
+                        {% for post in posts %}
+                        <article class="post-card">
+                            <div class="post-thumbnail">
+                                <img src="https://source.unsplash.com/random/400x300/?blog,post,{{ loop.index }}" alt="Post Thumbnail">
+                                <div class="post-category">Lifestyle</div>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="far fa-calendar-alt"></i> {{ post.created_at.strftime('%b %d, %Y') if post.created_at else '' }}</span>
+                                    <span class="post-comments"><i class="far fa-comment"></i> 12</span>
+                                </div>
+                                <h3 class="post-title"><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
+                                <p class="post-excerpt">{{ post.content|truncate(150) }}</p>
+                                <div class="post-footer">
+                                    <div class="author-info">
+                                        <div class="author-avatar">
+                                            <img src="https://i.pravatar.cc/30?img={{ loop.index + 3 }}" alt="Author">
+                                        </div>
+                                        <span class="author-name">{{ post.author }}</span>
+                                    </div>
+                                    {% if session.get('user_id') == post.user_id %}
+                                    <div class="post-actions">
+                                        <a href="/edit/{{ post.id }}" class="edit-btn"><i class="fas fa-edit"></i></a>
+                                        <form action="/delete/{{ post.id }}" method="POST">
+                                            <button type="submit" onclick="return confirm('Are you sure?')" class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <a href="#" class="page-nav disabled"><i class="fas fa-chevron-left"></i></a>
+                        <a href="#" class="page-number active">1</a>
+                        <a href="#" class="page-number">2</a>
+                        <a href="#" class="page-number">3</a>
+                        <span class="page-dots">...</span>
+                        <a href="#" class="page-number">8</a>
+                        <a href="#" class="page-nav"><i class="fas fa-chevron-right"></i></a>
+                    </div>
+                </section>
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <!-- Search Widget -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Search</h3>
+                        <form class="search-form">
+                            <input type="text" placeholder="Search posts...">
+                            <button type="submit"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+
+                    <!-- Categories Widget -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Categories</h3>
+                        <ul class="category-list">
+                            <li><a href="#">Technology <span>24</span></a></li>
+                            <li><a href="#">Lifestyle <span>18</span></a></li>
+                            <li><a href="#">Travel <span>15</span></a></li>
+                            <li><a href="#">Business <span>12</span></a></li>
+                            <li><a href="#">Food <span>8</span></a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Popular Posts Widget -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Popular Posts</h3>
+                        <div class="popular-posts">
+                            {% for post in posts[:4] %}
+                            <div class="popular-post">
+                                <div class="popular-post-image">
+                                    <img src="https://source.unsplash.com/random/80x80/?blog,{{ loop.index }}" alt="Popular Post">
+                                </div>
+                                <div class="popular-post-content">
+                                    <h4><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title|truncate(40) }}</a></h4>
+                                    <span class="post-date">{{ post.created_at.strftime('%b %d') if post.created_at else '' }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Tags Widget -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Tags</h3>
+                        <div class="tag-cloud">
+                            <a href="#">Technology</a>
+                            <a href="#">Design</a>
+                            <a href="#">Travel</a>
+                            <a href="#">Food</a>
+                            <a href="#">Business</a>
+                            <a href="#">Lifestyle</a>
+                            <a href="#">Health</a>
+                            <a href="#">Education</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Subscribe to Our Newsletter</h2>
+                <p>Get the latest posts delivered right to your inbox</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-widgets">
+                <div class="footer-widget">
+                    <div class="logo">
+                        <a href="/">Blog<span>Hub</span></a>
+                    </div>
+                    <p>A modern blogging platform for creative minds and passionate writers.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-widget">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-widget">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="#">Technology</a></li>
+                        <li><a href="#">Business</a></li>
+                        <li><a href="#">Lifestyle</a></li>
+                        <li><a href="#">Travel</a></li>
+                        <li><a href="#">Food</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-widget">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Blog Street, San Francisco, CA</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@bloghub.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2023 BlogHub. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            document.querySelector('.main-nav').classList.toggle('active');
+        });
+
+        // View options toggle
+        const viewOptions = document.querySelectorAll('.view-option');
+        viewOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                viewOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                const postsGrid = document.querySelector('.posts-grid');
+                if (this.querySelector('i').classList.contains('fa-list')) {
+                    postsGrid.classList.add('list-view');
+                } else {
+                    postsGrid.classList.remove('list-view');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
